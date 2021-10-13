@@ -27,16 +27,20 @@ contract INPV is ERC20 {
         _mint(msg.sender, 500);
     }
 
-    function getToken(string memory identityCardNumber) public {
+    function approveRegisterVoter(
+        string memory identityCardNumber,
+        address voterAddress
+    ) public {
         uint256 currentSupply = balanceOf(admin);
         require(currentSupply > 0, "running out of token supply");
         require(
             registeredVoters[identityCardNumber].isVal == false,
             "user already registered"
         );
-        registeredVoters[identityCardNumber] = Voter(true, msg.sender, false);
+        require(msg.sender == admin, "you are not admin");
+        registeredVoters[identityCardNumber] = Voter(true, voterAddress, false);
         registeredVotersLUT.push(identityCardNumber);
-        _transfer(admin, msg.sender, 1);
+        _transfer(admin, voterAddress, 1);
     }
 
     function myBalance() public view returns (uint256) {
@@ -67,7 +71,12 @@ contract INPV is ERC20 {
 
     function voteCandidateOne(string memory identityCardNumber) public {
         uint256 voterBalance = balanceOf(msg.sender);
+        require(msg.sender != admin, "admin cannot vote");
         require(voterBalance >= 1, "not enough amount of token");
+        require(
+            registeredVoters[identityCardNumber].isVal == true,
+            "you aren't registered"
+        );
         require(
             registeredVoters[identityCardNumber].isVoted == false,
             "you already voted"
@@ -80,7 +89,12 @@ contract INPV is ERC20 {
 
     function voteCandidateTwo(string memory identityCardNumber) public {
         uint256 voterBalance = balanceOf(msg.sender);
+        require(msg.sender != admin, "admin cannot vote");
         require(voterBalance >= 1, "not enough amount of token");
+        require(
+            registeredVoters[identityCardNumber].isVal == true,
+            "you aren't registered"
+        );
         require(
             registeredVoters[identityCardNumber].isVoted == false,
             "you already voted"
@@ -98,7 +112,12 @@ contract INPV is ERC20 {
     ) internal virtual override {
         super._beforeTokenTransfer(from, to, amount);
 
-        require(from == admin, "only admin can transfer");
+        require(
+            from == admin ||
+                from == 0x0000000000000000000000000000000000000000 ||
+                to == 0x0000000000000000000000000000000000000000,
+            "only admin can transfer"
+        );
     }
 
     function isAdmin() public view returns (bool) {
