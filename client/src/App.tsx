@@ -1,6 +1,6 @@
 import { Box } from '@chakra-ui/layout';
 import { Navbar } from 'components';
-import { HomePage } from 'pages';
+import { GetTokenPage, HomePage } from 'pages';
 import { Route, Switch } from 'react-router';
 
 function App() {
@@ -8,7 +8,8 @@ function App() {
     <Box color="blackAlpha.700">
       <Navbar />
       <Switch>
-        <Route path="/" component={HomePage} />
+        <Route exact path="/" component={HomePage} />
+        <Route path="/get-token" component={GetTokenPage} />
       </Switch>
     </Box>
   );
