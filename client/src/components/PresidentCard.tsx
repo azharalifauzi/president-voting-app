@@ -22,6 +22,9 @@ const PresidentCard: React.FC<PresidentCardProps> = ({
       w="96"
       justifySelf={justifySelf}
     >
+      <Text textAlign="center" fontWeight="semibold" fontSize="3xl" mb="6">
+        12
+      </Text>
       <AspectRatio borderRadius="50%" overflow="hidden" ratio={1}>
         <Image src={src} alt="Candidate One" />
       </AspectRatio>
