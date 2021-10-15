@@ -9,3 +9,5 @@ export const userDataAtom = atomWithStorage('userData', {
   address: '',
   name: '',
 });
+
+export const listUsernameAtom = atomWithStorage<Record<string, string>>('listUserName', {});

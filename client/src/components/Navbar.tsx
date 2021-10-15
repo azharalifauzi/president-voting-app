@@ -5,7 +5,7 @@ import IconINPV from 'assets/inpv-token.svg';
 import { Image } from '@chakra-ui/image';
 import { Button } from '@chakra-ui/button';
 import { useAtom } from 'jotai';
-import { userDataAtom, walletAtom } from 'global/jotai';
+import { listUsernameAtom, userDataAtom, walletAtom } from 'global/jotai';
 import Web3Modal from 'web3modal';
 import { ethers } from 'ethers';
 import {
@@ -17,7 +17,7 @@ import {
   ModalHeader,
   ModalOverlay,
 } from '@chakra-ui/modal';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Input } from '@chakra-ui/input';
 import { FormLabel } from '@chakra-ui/form-control';
 
@@ -54,8 +54,32 @@ export default Navbar;
 const UserProfile = () => {
   const [wallet, setWallet] = useAtom(walletAtom);
   const [userData, setUserData] = useAtom(userDataAtom);
+  const [listUserName, setListUserName] = useAtom(listUsernameAtom);
   const [isOpen, setOpen] = useState<boolean>(false);
   const [name, setName] = useState<string>(() => userData.name);
+
+  useEffect(() => {
+    async function listenToWallet() {
+      const web3modal = new Web3Modal();
+      const provider = await web3modal.connect();
+
+      provider.on('accountsChanged', (accounts: string[]) => {
+        const address = accounts[0];
+
+        setUserData({
+          address,
+          name: listUserName[address] ?? '',
+        });
+        setName(listUserName[address] ?? '');
+      });
+
+      provider.on('disconnect', (error: { code: number; message: string }) => {
+        setWallet({ isConnect: false, walletProvider: '' });
+      });
+    }
+
+    listenToWallet();
+  }, []);
 
   const connect = async () => {
     const web3modal = new Web3Modal();
@@ -98,6 +122,7 @@ const UserProfile = () => {
             <Button
               onClick={() => {
                 setUserData({ ...userData, name });
+                setListUserName({ ...listUserName, [userData.address]: name });
                 setOpen(false);
               }}
               colorScheme="twitter"
