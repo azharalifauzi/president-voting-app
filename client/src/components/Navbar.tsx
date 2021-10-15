@@ -21,6 +21,10 @@ import { useEffect, useState } from 'react';
 import { Input } from '@chakra-ui/input';
 import { FormLabel } from '@chakra-ui/form-control';
 
+import { INPV__factory } from 'types/ethers-contracts/factories/INPV__factory';
+import { useQuery } from 'react-query';
+import { inpvAddress } from 'config';
+
 const Navbar = () => {
   return (
     <Box boxShadow="sm">
@@ -80,6 +84,18 @@ const UserProfile = () => {
 
     listenToWallet();
   }, []);
+
+  const { data: balance, isFetchedAfterMount } = useQuery('inpv-token', async () => {
+    const web3Modal = new Web3Modal();
+    const connection = await web3Modal.connect();
+    const provider = new ethers.providers.Web3Provider(connection);
+    const signer = provider.getSigner();
+
+    const inpv = INPV__factory.connect(inpvAddress, provider);
+    const balance = await inpv.connect(signer).myBalance();
+
+    return balance;
+  });
 
   const connect = async () => {
     const web3modal = new Web3Modal();
@@ -169,7 +185,7 @@ const UserProfile = () => {
               <Image h="6" w="6" src={IconINPV} />
             </Box>
             <Text textAlign="center" my="3" fontSize="lg" fontWeight="semibold">
-              1 INPV
+              {!isFetchedAfterMount ? 'Loading...' : balance + ' INPV'}
             </Text>
             <Button
               onClick={() => setOpen(true)}
