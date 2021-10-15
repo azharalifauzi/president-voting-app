@@ -16,8 +16,8 @@ contract INPV is ERC20 {
         bool isVoted;
     }
 
-    mapping(string => Voter) public registeredVoters;
-    string[] public registeredVotersLUT;
+    mapping(string => Voter) private registeredVoters;
+    string[] private registeredVotersLUT;
 
     constructor() ERC20("Indonesia President Voting", "INPV") {
         admin = msg.sender;
@@ -45,6 +45,19 @@ contract INPV is ERC20 {
 
     function myBalance() public view returns (uint256) {
         return balanceOf(msg.sender);
+    }
+
+    function myInfo(string memory identityCardNumber)
+        public
+        view
+        returns (Voter memory)
+    {
+        Voter memory voter = registeredVoters[identityCardNumber];
+
+        require(voter.isVal == true, "user not registered");
+        require(voter.voterAddress == msg.sender, "your address doesn't match");
+
+        return voter;
     }
 
     function getAllVoters() public view returns (Voter[] memory) {

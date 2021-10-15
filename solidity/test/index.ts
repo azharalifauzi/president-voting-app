@@ -69,4 +69,16 @@ describe('Indonesia President Voting', function () {
     expect(await inpv.totalSupply()).to.equal(499);
     expect(await inpv.candidateTwo()).to.equal(1);
   });
+
+  it('should fetch my info', async function () {
+    const [, addr1] = await ethers.getSigners();
+    const inpv = await deployINPV();
+
+    await inpv.approveRegisterVoter('1001', addr1.address);
+
+    const voter = await inpv.connect(addr1).myInfo('1001');
+
+    expect(voter.isVal).to.equal(true);
+    expect(voter.voterAddress).to.equal(addr1.address);
+  });
 });
