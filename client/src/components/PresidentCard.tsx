@@ -5,6 +5,7 @@ interface PresidentCardProps extends GridItemProps {
   src: string;
   text?: string;
   buttonText?: string;
+  count?: number;
 }
 
 const PresidentCard: React.FC<PresidentCardProps> = ({
@@ -13,6 +14,7 @@ const PresidentCard: React.FC<PresidentCardProps> = ({
   text,
   buttonText,
   onVote,
+  count,
 }) => {
   return (
     <GridItem
@@ -23,7 +25,7 @@ const PresidentCard: React.FC<PresidentCardProps> = ({
       justifySelf={justifySelf}
     >
       <Text textAlign="center" fontWeight="semibold" fontSize="3xl" mb="6">
-        12
+        {count}
       </Text>
       <AspectRatio borderRadius="50%" overflow="hidden" ratio={1}>
         <Image src={src} alt="Candidate One" />

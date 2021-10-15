@@ -26,6 +26,18 @@ import { useQuery } from 'react-query';
 import { inpvAddress } from 'config';
 
 const Navbar = () => {
+  const { data: isAdmin } = useQuery('isAdmin', async () => {
+    const web3Modal = new Web3Modal();
+    const connection = await web3Modal.connect();
+    const provider = new ethers.providers.Web3Provider(connection);
+    const signer = provider.getSigner();
+
+    const inpv = INPV__factory.connect(inpvAddress, signer);
+    const isAdmin = await inpv.isAdmin();
+
+    return isAdmin;
+  });
+
   return (
     <Box boxShadow="sm">
       <Flex
@@ -43,9 +55,15 @@ const Navbar = () => {
           <Box _hover={{ color: 'blue.200' }}>
             <Link to="/">Home</Link>
           </Box>
-          <Box _hover={{ color: 'blue.200' }}>
-            <Link to="/get-token">Get Token</Link>
-          </Box>
+          {isAdmin ? (
+            <Box _hover={{ color: 'blue.200' }}>
+              <Link to="/admin">Admin Console</Link>
+            </Box>
+          ) : (
+            <Box _hover={{ color: 'blue.200' }}>
+              <Link to="/get-token">Get Token</Link>
+            </Box>
+          )}
           <UserProfile />
         </HStack>
       </Flex>
@@ -91,8 +109,8 @@ const UserProfile = () => {
     const provider = new ethers.providers.Web3Provider(connection);
     const signer = provider.getSigner();
 
-    const inpv = INPV__factory.connect(inpvAddress, provider);
-    const balance = await inpv.connect(signer).myBalance();
+    const inpv = INPV__factory.connect(inpvAddress, signer);
+    const balance = await inpv.myBalance();
 
     return balance;
   });
